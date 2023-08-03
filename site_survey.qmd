@@ -1,0 +1,90 @@
+---
+title: "Site survey"
+format: html
+editor: visual
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+library(tidyverse)
+library(scales)
+load("site_survey_orig.rda")
+theme_set(theme_classic())
+
+site_survey = site_survey_orig
+```
+
+# Hospital demographics
+
+::: {layout-ncol=2}
+
+```{r}
+
+barplot_count = function(df, var, title = NA){
+  df %>% 
+    drop_na({{var}}) %>% 
+    ggplot(aes(y = fct_rev(fct_infreq({{var}})))) +
+    geom_bar(colour = "darkblue", fill = "lightblue") +
+    geom_label(stat='count', aes(label=after_stat(count)), hjust=1, size = 10) +
+    scale_y_discrete(labels = label_wrap(15)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    ggtitle(title) +
+    ylab("") +
+    theme(axis.text  = element_text(size = 12, colour = "black"),
+          axis.title = element_text(size = 12, colour = "black"))
+}
+
+barplot_count(site_survey, hosp_type, "Hospital type")
+
+```
+
+
+```{r}
+barplot_count(site_survey, hosp_fund, "Hospital funding")
+```
+
+```{r}
+barplot_count(site_survey, hosp_itu_yn, "HDU or ITU facilities")
+```
+
+```{r}
+site_survey %>% 
+  ggplot(aes(parse_number(hosp_itu_bed))) +
+  geom_histogram() +
+  ggtitle("Number of HDU/ITU beds")
+```
+
+
+```{r}
+barplot_count(site_survey, hosp_hpb, "Specialised HPB team at your hospital")
+```
+
+```{r}
+barplot_count(site_survey, hosp_hpb_oncall, "On-call services from the HPB team")
+```
+
+```{r}
+barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct injury management")
+```
+
+```{r}
+barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB")
+```
+
+```{r}
+barplot_count(site_survey, hosp_mis_yn, "Minimally invasive surgery equipment")
+```
+```{r}
+barplot_count(site_survey, hosp_mis_type, "Minimally invasive surgery equipment type")
+```
+
+```{r}
+barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images")
+```
+
+
+:::
+
+# Training in cholecystectomy 
