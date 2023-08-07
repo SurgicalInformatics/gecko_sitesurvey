@@ -13,7 +13,11 @@ execute:
 ```{r}
 library(tidyverse)
 library(scales)
-load("site_survey_orig.rda")
+
+source("site_survey_pull.R")
+#save(site_survey_orig, file = "site_survey_orig.rda")
+#load("site_survey_orig.rda")
+
 theme_set(theme_classic())
 site_survey = site_survey_orig %>% 
   mutate(hosp_itu_bed = parse_number(hosp_itu_bed))

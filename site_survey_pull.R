@@ -32,9 +32,7 @@ site_survey_orig = site_survey_orig %>%
 
 n_records1 = n_distinct(site_survey_orig$record_id)
 stopifnot(n_records0 == n_records1)
+stopifnot(nrow(drop_na(wb)) == nrow(wb))
 
-save(site_survey_orig, file = "site_survey_orig.rda")
-
-
-site_survey %>% 
-  filter(is.na(wb))
+# site_survey %>% 
+#   filter(is.na(wb))
