@@ -20,7 +20,8 @@ source("site_survey_pull.R")
 
 theme_set(theme_classic())
 site_survey = site_survey_orig %>% 
-  mutate(hosp_itu_bed = parse_number(hosp_itu_bed))
+  mutate(hosp_itu_bed = parse_number(hosp_itu_bed),
+         train_n = parse_number(train_n))
 ```
 
 ```{r}
