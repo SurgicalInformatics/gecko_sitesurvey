@@ -1,6 +1,6 @@
 ---
 title: "Wellcome LEAP Cholecystectomy (Gecko) study Site survey interim results"
-date: last-modified
+date: today
 date-format: "DD-MMMM YYYY"
 format: html
 editor: visual
@@ -15,7 +15,7 @@ library(tidyverse)
 library(scales)
 
 source("site_survey_pull.R")
-#save(site_survey_orig, file = "site_survey_orig.rda")
+save(site_survey_orig, file = "site_survey_orig.rda")
 #load("site_survey_orig.rda")
 
 theme_set(theme_classic())
@@ -27,13 +27,13 @@ site_survey = site_survey_orig %>%
 ```{r}
 # Functions
 
-barplot_count = function(df, var, title = NA, high_n = TRUE){
+barplot_count = function(df, var, title = NA, high_n = 50){
   df %>% 
     drop_na({{var}}) %>% 
     ggplot(aes(y = fct_rev(fct_infreq({{var}})))) +
     geom_bar(colour = "#2166ac", fill = "#d1e5f0") +
-    geom_text(stat='count', aes(label=after_stat(count)),
-              hjust = high_n,
+    geom_text(stat='count', aes(label=after_stat(count),
+                                hjust = if_else(after_stat(count) > high_n, 1, 0)),
               size  = 10,
               label.padding=unit(0.3, "lines")) +
     scale_y_discrete(labels = label_wrap(15)) +
@@ -104,25 +104,25 @@ barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct 
 
 
 ```{r, fig.width=12, fig.height = 5}
-barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB", high_n = FALSE) +
+barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB") +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.3), add = c(0, 0)))
 ```
 
 ```{r, fig.width=12, fig.height = 5}
-barplot_count(site_survey, hosp_mis_yn, "Minimally invasive surgery equipment", high_n = FALSE) +
+barplot_count(site_survey, hosp_mis_yn, "Minimally invasive surgery equipment") +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.36), add = c(0, 0)))
 ```
 
 ```{r, fig.width=14, fig.height = 5}
-barplot_count(site_survey, hosp_mis_type, "Minimally invasive surgery equipment type", high_n = FALSE) +
+barplot_count(site_survey, hosp_mis_type, "Minimally invasive surgery equipment type") +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
 
 ```{r, fig.width=12, fig.height = 5}
-barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images", high_n = FALSE) +
+barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images") +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
@@ -161,7 +161,7 @@ barplot_count(site_survey, tain_chole, "Structured programmes/coaching for chole
 
 ```{r, fig.width = 12, fig.height = 8}
 barplot_count(site_survey, train_bdi,
-              "Structured programmes/coaching for bile duct injury training", high_n = FALSE) +
+              "Structured programmes/coaching for bile duct injury training", high_n = 80) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
