@@ -2,14 +2,13 @@
 title: "GECKO data dashboard"
 format: html
 theme: cerulean
-editor: visual
+editor: source
 execute:
   echo: false
   warning: false
 editor_options: 
   chunk_output_type: console
 ---
-
 
 ```{r}
 library(tidyverse)
@@ -19,11 +18,14 @@ library(bslib)
 library(bsicons)
 library(shiny)
 
-# GECKO green is #6b7d51
+# GECKO green is #74a73e
 
 source("patient_data_pull.R")
-save(patient_data_orig, file = "patient_data_orig.rda")
+#save(patient_data_orig, file = "patient_data_orig.rda")
 #load("patient_data_orig.rda")
+
+source("registrations_pull.R")
+source("world_map.R")
 
 #patient_data_orig$period %>% unique()
 
@@ -33,7 +35,11 @@ patient_data = patient_data_orig %>%
   mutate(op_performed = str_extract(op_performed, "^.*(?=(\\{))")) %>% 
   mutate(period = fct_explicit_na(period, "Missing")) %>% 
   mutate(period = if_else(period %in% c("Period 1: 31st Jul - 13th Aug 2023",
-                                        "Period 2: 14th Aug - 27th Aug 2023"), period, "Missing"))
+                                        "Period 2: 14th Aug - 27th Aug 2023",
+                                        "Period 3: 28th Aug - 10th Sept 2023"), period, "Missing"))
+
+
+registrations = registrations_orig
 
 ```
 
@@ -78,45 +84,117 @@ histogram = function(df, var, title = NA, xlab = NA, ylab = NA){
 
 ```
 
-::: {layout-ncol=1}
-
+::: {layout-ncol="1"}
 ```{r}
 bslib::value_box(
-  title = "GECKO",
-  value = paste(n_records, "records started"),
+  title = "GECKO patient data:",
+  value = paste(n_records, "records from"),
   showcase = bs_icon("clipboard2-pulse-fill"),
+  h3(paste(n_distinct(patient_data$redcap_data_access_group), "hospitals in")),
+  h3(paste(n_distinct(patient_data$country), "countries")),
+  br(),
   p("Updated:"),
   p(format(Sys.time(), "%d-%b %Y")),
   theme_color = "success"
   )
 ```
 
+&nbsp;
+
+```{r}
+bslib::value_box(
+  title = "GECKO registrations:",
+  value = paste(nrow(registrations), "hospitals from"),
+  showcase = bs_icon("clipboard2-pulse-fill"),
+  h3(paste(n_distinct(registrations$country), "countries")),
+  br(),
+  p("Updated:"),
+  p(format(Sys.time(), "%d-%b %Y")),
+  theme_color = "warning"
+  )
+```
+
+
+```{r}
+map_patients
+```
+
+
+```{r}
+map_registrations
+```
+
+
 :::
-::: {layout-ncol=2}
 
+::: {layout-ncol="2"}
 ```{r}
-barplot_count(patient_data, period, "Data collection period", high_n = 100)
+barplot_count(patient_data, period, "Data collection period", high_n = 400)
 ```
 
 ```{r}
-barplot_count(patient_data, wb, "World bank income group")
+barplot_count(patient_data, wb, "World bank income group", high_n = 300)
 ```
 
 ```{r}
-barplot_count(patient_data, op_performed, "Operation performed") +
+barplot_count(patient_data, op_performed, "Operation performed", high_n = 150) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
-
 :::
 
-::: {layout-ncol=1}
+::: {layout-ncol="1"}
 ```{r, fig.width = 12, fig.height = 8}
 barplot_count(patient_data, op_approach,
               "Operative approach by World Bank income group",
-              high_n = 60) +
+              high_n = 200) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0))) +
   facet_wrap(~wb, ncol = 4)
 ```
 
 
+## Top 10 countries
+
+```{r}
+patient_data %>% 
+  count(country, sort = TRUE, name = "n_patients") %>% 
+  slice(1:10) %>% 
+  knitr::kable()
+```
+
+## Top 10 hospitals
+
+```{r}
+patient_data %>% 
+  count(redcap_data_access_group, sort = TRUE, name = "n_patients") %>% 
+  slice(1:10) %>% 
+  knitr::kable()
+```
+
+
+## NIHR Global Surgery Unit hub countries
+
+```{r}
+hub_countries = c("Mexico", "Nigeria", "India", "Ghana", "Rwanda", "Benin", "South Africa")
+patient_data %>% 
+  filter(country %in% hub_countries) %>% 
+  mutate(country = fct_expand(country, hub_countries)) %>% 
+  count(country, sort = TRUE, name = "n_patients", .drop = FALSE) %>% 
+  knitr::kable()
+
+```
+
+#### Registrations NIHR Global Surgery Unit hub countries
+
+```{r}
+hub_countries = c("Mexico", "Nigeria", "India", "Ghana", "Rwanda", "Benin", "South Africa")
+registrations %>% 
+  filter(country %in% hub_countries) %>% 
+  mutate(country = fct_expand(country, hub_countries)) %>% 
+  count(country, sort = TRUE, name = "n_hospitals", .drop = FALSE) %>% 
+  knitr::kable()
+
+```
+
+
 :::
+

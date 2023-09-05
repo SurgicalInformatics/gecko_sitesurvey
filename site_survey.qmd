@@ -4,20 +4,21 @@ date: today
 date-format: "DD-MMMM YYYY"
 format: html
 editor: visual
+theme: cerulean
 execute:
   echo: false
   warning: false
 ---
-
 
 ```{r}
 library(tidyverse)
 library(scales)
 
 source("site_survey_pull.R")
-save(site_survey_orig, file = "site_survey_orig.rda")
+#save(site_survey_orig, file = "site_survey_orig.rda")
 #load("site_survey_orig.rda")
 
+n_records = nrow(site_survey_orig)
 theme_set(theme_classic())
 site_survey = site_survey_orig %>% 
   mutate(hosp_itu_bed = parse_number(hosp_itu_bed),
@@ -63,16 +64,30 @@ histogram = function(df, var, title = NA, xlab = NA, ylab = NA){
 
 ```
 
+::: {layout-ncol="1"}
+```{r}
 
+library(bslib)
+library(bsicons)
+library(shiny)
+
+bslib::value_box(
+  title = "GECKO",
+  value = paste(n_records, "site surveys completed"),
+  showcase = bs_icon("hospital"),
+  p("Updated:"),
+  p(format(Sys.time(), "%d-%b %Y")),
+  theme_color = "info"
+  )
+```
+:::
 
 # Hospital demographics
 
-::: {layout-ncol=2}
-
+::: {layout-ncol="2"}
 ```{r}
 barplot_count(site_survey, hosp_type, "Hospital type")
 ```
-
 
 ```{r}
 barplot_count(site_survey, hosp_fund, "Hospital funding")
@@ -86,7 +101,6 @@ barplot_count(site_survey, hosp_itu_yn, "HDU or ITU facilities")
 histogram(site_survey, hosp_itu_bed, "Number of HDU/ITU beds", "Number of beds", "Number of hospitals")
 ```
 
-
 ```{r}
 barplot_count(site_survey, hosp_hpb, "Specialised HPB team at your hospital")
 ```
@@ -98,11 +112,9 @@ barplot_count(site_survey, hosp_hpb_oncall, "On-call services from the HPB team"
 ```{r}
 barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct injury management")
 ```
-
 :::
-::: {layout-ncol=1}
 
-
+::: {layout-ncol="1"}
 ```{r, fig.width=12, fig.height = 5}
 barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB") +
   facet_wrap(~wb, ncol = 4) +
@@ -126,12 +138,11 @@ barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images") +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
-
 :::
-# Training in cholecystectomy 
-::: {layout-ncol=2}
 
+# Training in cholecystectomy
 
+::: {layout-ncol="2"}
 ```{r}
 barplot_count(site_survey, train_perform, "Trainees who perform gallbladder surgery")
 ```
@@ -140,11 +151,11 @@ barplot_count(site_survey, train_perform, "Trainees who perform gallbladder surg
 histogram(site_survey, train_n, "Trainees who perform gallbladder surgery", "Number of trainees", "Number of hospitals")
 ```
 
-```{r, fig.height = 13}
+```{r, fig.height = 17}
 barplot_count(site_survey, train_grade, "Grade of trainees performing gallbladder surgery")
 ```
 
-```{r, fig.height = 8}
+```{r, fig.height = 12}
 barplot_count(site_survey, train_sim_yn, "Facilities for simulations training for cholecystectomies?")
 ```
 
@@ -155,16 +166,13 @@ barplot_count(site_survey, train_sim_type, "Types of training simulation availab
 ```{r, fig.height = 8}
 barplot_count(site_survey, tain_chole, "Structured programmes/coaching for cholecystectomy training")
 ```
-
 :::
-::: {layout-ncol=1}
 
-```{r, fig.width = 12, fig.height = 8}
+::: {layout-ncol="1"}
+```{r, fig.width = 12, fig.height = 10}
 barplot_count(site_survey, train_bdi,
               "Structured programmes/coaching for bile duct injury training", high_n = 80) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
-
-
 :::
