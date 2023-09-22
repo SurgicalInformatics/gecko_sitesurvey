@@ -1,6 +1,8 @@
 ---
 title: "GECKO data dashboard"
-format: html
+format: 
+  html:
+    embed-resources: true
 theme: cerulean
 editor: source
 execute:
@@ -13,16 +15,16 @@ editor_options:
 ```{r}
 library(tidyverse)
 library(scales)
-theme_set(theme_classic())
 library(bslib)
 library(bsicons)
 library(shiny)
 
+
 # GECKO green is #74a73e
 
-source("patient_data_pull.R")
+#source("patient_data_pull.R")
 #save(patient_data_orig, file = "patient_data_orig.rda")
-#load("patient_data_orig.rda")
+load("patient_data_orig.rda")
 
 source("registrations_pull.R")
 source("world_map.R")
@@ -36,7 +38,9 @@ patient_data = patient_data_orig %>%
   mutate(period = fct_explicit_na(period, "Missing")) %>% 
   mutate(period = if_else(period %in% c("Period 1: 31st Jul - 13th Aug 2023",
                                         "Period 2: 14th Aug - 27th Aug 2023",
-                                        "Period 3: 28th Aug - 10th Sept 2023"), period, "Missing"))
+                                        "Period 3: 28th Aug - 10th Sept 2023",
+                                        "Period 4: 11th Sept - 24th Sept 2023",
+                                        "Period 5: 25th Sept - 8th Oct 2023"), period, "Missing"))
 
 
 registrations = registrations_orig
@@ -46,12 +50,18 @@ registrations = registrations_orig
 ```{r}
 # Functions
 
+theme_set(theme_classic())
+theme_update(axis.text  = element_text(size = 16, colour = "black"),
+             axis.title = element_text(size = 16, colour = "black"),
+             plot.title = element_text(size = 20, colour = "black"),
+             strip.text = element_text(size = 16, colour = "black"))
+
 barplot_count = function(df, var, title = NA, high_n = 50){
   df %>% 
     drop_na({{var}}) %>% 
     ggplot(aes(y = fct_rev(fct_infreq({{var}})) %>% fct_relevel("Missing"))) +
     geom_bar(colour = "#2166ac", fill = "#d1e5f0") +
-    geom_text(stat='count', aes(label=after_stat(count),
+    geom_text(stat='count', aes(label=comma(after_stat(count)),
                                 hjust = if_else(after_stat(count) > high_n, 1, 0)),
               size  = 10,
               label.padding=unit(0.3, "lines")) +
@@ -59,11 +69,7 @@ barplot_count = function(df, var, title = NA, high_n = 50){
     scale_x_continuous(expand = expansion(mult = c(0, 0), add = c(0, 0))) +
     ggtitle(str_wrap(title, 30)) +
     ylab("") +
-    xlab("Number of patients") +
-    theme(axis.text  = element_text(size = 16, colour = "black"),
-          axis.title = element_text(size = 16, colour = "black"),
-          plot.title = element_text(size = 20, colour = "black"),
-          strip.text = element_text(size = 16, colour = "black"))
+    xlab("Number of patients")
   
 }
 
@@ -75,11 +81,7 @@ histogram = function(df, var, title = NA, xlab = NA, ylab = NA){
     xlab(xlab) +
     ylab(ylab) +
     scale_x_continuous(expand = expansion(mult = c(0, 0), add = c(0, 0))) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.1), add = c(0, 0))) +
-    theme_bw() +
-    theme(axis.text  = element_text(size = 16, colour = "black"),
-          axis.title = element_text(size = 16, colour = "black"),
-          plot.title = element_text(size = 20, colour = "black"))
+    scale_y_continuous(expand = expansion(mult = c(0, 0.1), add = c(0, 0)))
 }
 
 ```
@@ -96,7 +98,7 @@ bslib::value_box(
   p("Updated:"),
   p(format(Sys.time(), "%d-%b %Y")),
   theme_color = "success"
-  )
+)
 ```
 
 &nbsp;
@@ -111,7 +113,7 @@ bslib::value_box(
   p("Updated:"),
   p(format(Sys.time(), "%d-%b %Y")),
   theme_color = "warning"
-  )
+)
 ```
 
 
@@ -128,7 +130,7 @@ map_registrations
 :::
 
 ::: {layout-ncol="2"}
-```{r}
+```{r, fig.height=10}
 barplot_count(patient_data, period, "Data collection period", high_n = 400)
 ```
 
@@ -137,18 +139,18 @@ barplot_count(patient_data, wb, "World bank income group", high_n = 300)
 ```
 
 ```{r}
-barplot_count(patient_data, op_performed, "Operation performed", high_n = 150) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
+barplot_count(patient_data, op_performed, "Operation performed", high_n = 400) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)))
 ```
 :::
 
 ::: {layout-ncol="1"}
-```{r, fig.width = 12, fig.height = 8}
+```{r, fig.width = 12, fig.height = 12}
 barplot_count(patient_data, op_approach,
               "Operative approach by World Bank income group",
-              high_n = 200) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0))) +
-  facet_wrap(~wb, ncol = 4)
+              high_n = 400) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)), labels = scales::label_comma()) +
+  facet_wrap(~wb, ncol = 1)
 ```
 
 
