@@ -22,14 +22,14 @@ library(shiny)
 
 # GECKO green is #74a73e
 
-#source("patient_data_pull.R")
+source("patient_data_pull.R")
 #save(patient_data_orig, file = "patient_data_orig.rda")
-load("patient_data_orig.rda")
+#load("patient_data_orig.rda")
 
 source("registrations_pull.R")
 source("world_map.R")
 
-#patient_data_orig$period %>% unique()
+#patient_data_orig$period %>% unique() %>% factor() %>% levels()
 
 n_records = nrow(patient_data_orig)
 patient_data = patient_data_orig %>% 
@@ -40,7 +40,8 @@ patient_data = patient_data_orig %>%
                                         "Period 2: 14th Aug - 27th Aug 2023",
                                         "Period 3: 28th Aug - 10th Sept 2023",
                                         "Period 4: 11th Sept - 24th Sept 2023",
-                                        "Period 5: 25th Sept - 8th Oct 2023"), period, "Missing"))
+                                        "Period 5: 25th Sept - 8th Oct 2023",
+                                        "Period 6: 9th Oct - 22nd Oct 2023"), period, "Missing"))
 
 
 registrations = registrations_orig
@@ -135,7 +136,7 @@ barplot_count(patient_data, period, "Data collection period", high_n = 400)
 ```
 
 ```{r}
-barplot_count(patient_data, wb, "World bank income group", high_n = 300)
+barplot_count(patient_data, wb, "World bank income group", high_n = 1000)
 ```
 
 ```{r}
