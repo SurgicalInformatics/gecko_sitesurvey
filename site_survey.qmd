@@ -13,56 +13,20 @@ execute:
 ```{r}
 library(tidyverse)
 library(scales)
+source("functions.R")
 
 source("site_survey_pull.R")
 #save(site_survey_orig, file = "site_survey_orig.rda")
 #load("site_survey_orig.rda")
 
 n_records = nrow(site_survey_orig)
-theme_set(theme_classic())
 site_survey = site_survey_orig %>% 
   mutate(hosp_itu_bed = parse_number(hosp_itu_bed),
          train_n = parse_number(train_n))
+
+xlab = "Number of hospitals"
 ```
 
-```{r}
-# Functions
-
-barplot_count = function(df, var, title = NA, high_n = 50){
-  df %>% 
-    drop_na({{var}}) %>% 
-    ggplot(aes(y = fct_rev(fct_infreq({{var}})))) +
-    geom_bar(colour = "#2166ac", fill = "#d1e5f0") +
-    geom_text(stat='count', aes(label=after_stat(count),
-                                hjust = if_else(after_stat(count) > high_n, 1, 0)),
-              size  = 10,
-              label.padding=unit(0.3, "lines")) +
-    scale_y_discrete(labels = label_wrap(15)) +
-    scale_x_continuous(expand = expansion(mult = c(0, 0), add = c(0, 0))) +
-    ggtitle(str_wrap(title, 30)) +
-    ylab("") +
-    theme(axis.text  = element_text(size = 16, colour = "black"),
-          axis.title = element_text(size = 16, colour = "black"),
-          plot.title = element_text(size = 20, colour = "black"))
-  
-}
-
-histogram = function(df, var, title = NA, xlab = NA, ylab = NA){
-  df %>% 
-    ggplot(aes({{var}})) +
-    geom_histogram(binwidth = 10) +
-    ggtitle(str_wrap(title, 30)) +
-    xlab(xlab) +
-    ylab(ylab) +
-    scale_x_continuous(expand = expansion(mult = c(0, 0), add = c(0, 0))) +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.1), add = c(0, 0))) +
-    theme_bw() +
-    theme(axis.text  = element_text(size = 16, colour = "black"),
-          axis.title = element_text(size = 16, colour = "black"),
-          plot.title = element_text(size = 20, colour = "black"))
-}
-
-```
 
 ::: {layout-ncol="1"}
 ```{r}
@@ -86,15 +50,15 @@ bslib::value_box(
 
 ::: {layout-ncol="2"}
 ```{r}
-barplot_count(site_survey, hosp_type, "Hospital type")
+barplot_count(site_survey, hosp_type, "Hospital type", xlab = xlab)
 ```
 
 ```{r}
-barplot_count(site_survey, hosp_fund, "Hospital funding")
+barplot_count(site_survey, hosp_fund, "Hospital funding", xlab = xlab)
 ```
 
 ```{r}
-barplot_count(site_survey, hosp_itu_yn, "HDU or ITU facilities")
+barplot_count(site_survey, hosp_itu_yn, "HDU or ITU facilities", xlab = xlab)
 ```
 
 ```{r}
@@ -102,39 +66,72 @@ histogram(site_survey, hosp_itu_bed, "Number of HDU/ITU beds", "Number of beds",
 ```
 
 ```{r}
-barplot_count(site_survey, hosp_hpb, "Specialised HPB team at your hospital")
+barplot_count(site_survey, hosp_hpb, "Specialised HPB team at your hospital", xlab = xlab)
 ```
 
-```{r}
-barplot_count(site_survey, hosp_hpb_oncall, "On-call services from the HPB team")
-```
 
 ```{r}
-barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct injury management")
+barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct injury management", xlab = xlab)
 ```
 :::
 
 ::: {layout-ncol="1"}
+
+::: {.panel-tabset}
+
+## Plot
+
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, hosp_hpb_oncall) +
+  ggtitle("On-call services from the HPB team")
+
+```
+
+
+## Counts
+
+```{r, fig.height=8, fig.width=10}
+barplot_count(site_survey, hosp_hpb_oncall, "On-call services from the HPB team", xlab) +
+  facet_wrap(~wb)
+```
+:::
+
+
+::: {.panel-tabset}
+
+## Plot
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, hosp_hpb_region) +
+  ggtitle("On-call surgeons specialised in HPB")
+
+```
+
+## Counts
+
 ```{r, fig.width=12, fig.height = 5}
-barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB") +
+barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB", xlab = xlab) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.3), add = c(0, 0)))
 ```
 
+
+:::
+
+
 ```{r, fig.width=12, fig.height = 5}
-barplot_count(site_survey, hosp_mis_yn, "Minimally invasive surgery equipment") +
+barplot_count(site_survey, hosp_mis_yn, "Minimally invasive surgery equipment", xlab = xlab) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.36), add = c(0, 0)))
 ```
 
 ```{r, fig.width=14, fig.height = 5}
-barplot_count(site_survey, hosp_mis_type, "Minimally invasive surgery equipment type") +
+barplot_count(site_survey, hosp_mis_type, "Minimally invasive surgery equipment type", xlab = xlab) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
 
 ```{r, fig.width=12, fig.height = 5}
-barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images") +
+barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images", xlab = xlab) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
@@ -144,35 +141,94 @@ barplot_count(site_survey, hosp_mis_image, "Routine intraoperative images") +
 
 ::: {layout-ncol="2"}
 ```{r}
-barplot_count(site_survey, train_perform, "Trainees who perform gallbladder surgery")
+barplot_count(site_survey, train_perform, "Trainees who perform gallbladder surgery", xlab = xlab)
 ```
 
 ```{r}
 histogram(site_survey, train_n, "Trainees who perform gallbladder surgery", "Number of trainees", "Number of hospitals")
 ```
-
-```{r, fig.height = 17}
-barplot_count(site_survey, train_grade, "Grade of trainees performing gallbladder surgery")
-```
-
-```{r, fig.height = 12}
-barplot_count(site_survey, train_sim_yn, "Facilities for simulations training for cholecystectomies?")
-```
-
-```{r, fig.height = 8}
-barplot_count(site_survey, train_sim_type, "Types of training simulation available")
-```
-
-```{r, fig.height = 8}
-barplot_count(site_survey, tain_chole, "Structured programmes/coaching for cholecystectomy training")
-```
 :::
 
 ::: {layout-ncol="1"}
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, train_grade) +
+  ggtitle("Grade of trainees who perform gallbladder surgery")
+```
+
+
+::: {.panel-tabset}
+
+## Plot
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, train_sim_yn) +
+  ggtitle("Facilities for simulations training for cholecystectomies?")
+```
+
+## Counts
+
+```{r, fig.height = 8, fig.width=10}
+barplot_count(site_survey, train_sim_yn, "Facilities for simulations training for cholecystectomies?", xlab = xlab) +
+  facet_wrap(~wb, ncol = 4)
+```
+
+:::
+
+::: {.panel-tabset}
+
+## Plot
+
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, train_sim_type) +
+  ggtitle("Types of training simulation available")
+```
+
+## Counts
+
+```{r, fig.height = 8, fig.width=10}
+barplot_count(site_survey, train_sim_type, "Types of training simulation available", xlab = xlab) +
+  facet_wrap(~wb, ncol = 4)
+```
+
+:::
+
+
+::: {.panel-tabset}
+
+## Plot
+
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, tain_chole) +
+  ggtitle("Structured programmes/coaching for cholecystectomy training")
+```
+
+## Counts
+
+```{r, fig.height = 8, fig.width=10}
+barplot_count(site_survey, tain_chole, "Structured programmes/coaching for cholecystectomy training", xlab = xlab) +
+  facet_wrap(~wb, ncol = 4)
+```
+
+:::
+
+::: {.panel-tabset}
+
+## Plot
+
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, train_bdi) +
+  ggtitle("Structured programmes/coaching for bile duct injury training")
+```
+
+## Counts
+
 ```{r, fig.width = 12, fig.height = 10}
 barplot_count(site_survey, train_bdi,
-              "Structured programmes/coaching for bile duct injury training", high_n = 80) +
+              "Structured programmes/coaching for bile duct injury training", high_n = 80, xlab = xlab) +
   facet_wrap(~wb, ncol = 4) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
+
+:::
+
+
 :::

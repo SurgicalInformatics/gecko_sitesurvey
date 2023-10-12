@@ -1,18 +1,18 @@
 library(tidyverse)
 
 registrations_orig <- list("token"=Sys.getenv("gecko_teamreg_token"),
-                         content='report',
-                         action='export',
-                         format='csv',
-                         type='flat',
-                         csvDelimiter='',
-                         report_id= 505,
-                         rawOrLabel='label',
-                         rawOrLabelHeaders='raw',
-                         exportCheckboxLabel='false',
-                         exportSurveyFields='false',
-                         exportDataAccessGroups='false',
-                         returnFormat='json') %>% 
+                           content='report',
+                           action='export',
+                           format='csv',
+                           type='flat',
+                           csvDelimiter='',
+                           report_id= 505,
+                           rawOrLabel='label',
+                           rawOrLabelHeaders='raw',
+                           exportCheckboxLabel='false',
+                           exportSurveyFields='false',
+                           exportDataAccessGroups='false',
+                           returnFormat='json') %>% 
   httr::POST(Sys.getenv("redcap_globalsurg_uri"), body = ., encode = "form") %>% 
   httr::content()
 
