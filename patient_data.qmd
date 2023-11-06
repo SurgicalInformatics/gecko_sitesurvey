@@ -35,13 +35,7 @@ n_records = nrow(patient_data_orig)
 patient_data = patient_data_orig %>% 
   # REDCap sends the data fields including sub-var names in {}, removing here:
   mutate(op_performed = str_extract(op_performed, "^.*(?=(\\{))")) %>% 
-  mutate(period = fct_explicit_na(period, "Missing")) %>% 
-  mutate(period = if_else(period %in% c("Period 1: 31st Jul - 13th Aug 2023",
-                                        "Period 2: 14th Aug - 27th Aug 2023",
-                                        "Period 3: 28th Aug - 10th Sept 2023",
-                                        "Period 4: 11th Sept - 24th Sept 2023",
-                                        "Period 5: 25th Sept - 8th Oct 2023",
-                                        "Period 6: 9th Oct - 22nd Oct 2023"), period, "Missing"))
+  mutate(period = fct_explicit_na(period, "Missing"))
 
 
 registrations = registrations_orig
@@ -91,9 +85,10 @@ histogram = function(df, var, title = NA, xlab = NA, ylab = NA){
 ```{r}
 bslib::value_box(
   title = "GECKO patient data:",
-  value = paste(n_records, "records from"),
+  value = paste(prettyNum(n_records, big.mark = ","), "records from"),
   showcase = bs_icon("clipboard2-pulse-fill"),
-  h3(paste(n_distinct(patient_data$redcap_data_access_group), "hospitals in")),
+  h3(paste(n_distinct(patient_data$redcap_data_access_group) %>% 
+             prettyNum(big.mark = ","), "hospitals in")),
   h3(paste(n_distinct(patient_data$country), "countries")),
   br(),
   p("Updated:"),
@@ -107,7 +102,8 @@ bslib::value_box(
 ```{r}
 bslib::value_box(
   title = "GECKO registrations:",
-  value = paste(nrow(registrations), "hospitals from"),
+  value = paste(nrow(registrations)%>% 
+             prettyNum(big.mark = ","), "hospitals from"),
   showcase = bs_icon("clipboard2-pulse-fill"),
   h3(paste(n_distinct(registrations$country), "countries")),
   br(),
@@ -136,11 +132,11 @@ barplot_count(patient_data, period, "Data collection period", high_n = 400)
 ```
 
 ```{r}
-barplot_count(patient_data, wb, "World bank income group", high_n = 1000)
+barplot_count(patient_data, wb, "World bank income group", high_n = 2000)
 ```
 
 ```{r}
-barplot_count(patient_data, op_performed, "Operation performed", high_n = 400) +
+barplot_count(patient_data, op_performed, "Operation performed", high_n = 4000) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)))
 ```
 :::
@@ -149,7 +145,7 @@ barplot_count(patient_data, op_performed, "Operation performed", high_n = 400) +
 ```{r, fig.width = 12, fig.height = 12}
 barplot_count(patient_data, op_approach,
               "Operative approach by World Bank income group",
-              high_n = 400) +
+              high_n = 1500) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)), labels = scales::label_comma()) +
   facet_wrap(~wb, ncol = 1)
 ```
