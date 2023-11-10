@@ -27,7 +27,6 @@ site_survey = site_survey_orig %>%
 xlab = "Number of hospitals"
 ```
 
-
 ::: {layout-ncol="1"}
 ```{r}
 
@@ -69,15 +68,20 @@ histogram(site_survey, hosp_itu_bed, "Number of HDU/ITU beds", "Number of beds",
 barplot_count(site_survey, hosp_hpb, "Specialised HPB team at your hospital", xlab = xlab)
 ```
 
-
 ```{r}
 barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct injury management", xlab = xlab)
 ```
 :::
 
 ::: {layout-ncol="1"}
+::: panel-tabset
 
-::: {.panel-tabset}
+## Counts
+
+```{r, fig.height=8, fig.width=10}
+barplot_count(site_survey, hosp_hpb_oncall, "On-call services from the HPB team", xlab) +
+  facet_wrap(~wb)
+```
 
 ## Plot
 
@@ -87,24 +91,9 @@ mytreemap(site_survey, wb, hosp_hpb_oncall) +
 
 ```
 
-
-## Counts
-
-```{r, fig.height=8, fig.width=10}
-barplot_count(site_survey, hosp_hpb_oncall, "On-call services from the HPB team", xlab) +
-  facet_wrap(~wb)
-```
 :::
 
-
-::: {.panel-tabset}
-
-## Plot
-```{r, fig.height = 5, fig.width=10}
-mytreemap(site_survey, wb, hosp_hpb_region) +
-  ggtitle("On-call surgeons specialised in HPB")
-
-```
+::: panel-tabset
 
 ## Counts
 
@@ -114,9 +103,15 @@ barplot_count(site_survey, hosp_hpb_region, "On-call surgeons specialised in HPB
   scale_x_continuous(expand = expansion(mult = c(0, 0.3), add = c(0, 0)))
 ```
 
+## Plot
+
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, hosp_hpb_region) +
+  ggtitle("On-call surgeons specialised in HPB")
+
+```
 
 :::
-
 
 ```{r, fig.width=12, fig.height = 5}
 barplot_count(site_survey, hosp_mis_yn, "Minimally invasive surgery equipment", xlab = xlab) +
@@ -150,19 +145,27 @@ histogram(site_survey, train_n, "Trainees who perform gallbladder surgery", "Num
 :::
 
 ::: {layout-ncol="1"}
+::: panel-tabset
+
+## Counts
+
+```{r, fig.width=13, fig.height = 15}
+barplot_count(site_survey, train_grade, "Grade of trainees who perform gallbladder surgery", xlab = xlab) +
+  facet_wrap(~wb, ncol = 4) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.3), add = c(0, 0)))
+```
+
+## Plot
+
+
 ```{r, fig.height = 5, fig.width=10}
 mytreemap(site_survey, wb, train_grade) +
   ggtitle("Grade of trainees who perform gallbladder surgery")
 ```
 
+:::
 
-::: {.panel-tabset}
-
-## Plot
-```{r, fig.height = 5, fig.width=10}
-mytreemap(site_survey, wb, train_sim_yn) +
-  ggtitle("Facilities for simulations training for cholecystectomies?")
-```
+::: panel-tabset
 
 ## Counts
 
@@ -171,16 +174,17 @@ barplot_count(site_survey, train_sim_yn, "Facilities for simulations training fo
   facet_wrap(~wb, ncol = 4)
 ```
 
-:::
-
-::: {.panel-tabset}
-
 ## Plot
 
 ```{r, fig.height = 5, fig.width=10}
-mytreemap(site_survey, wb, train_sim_type) +
-  ggtitle("Types of training simulation available")
+mytreemap(site_survey, wb, train_sim_yn) +
+  ggtitle("Facilities for simulations training for cholecystectomies?")
 ```
+
+
+:::
+
+::: panel-tabset
 
 ## Counts
 
@@ -189,17 +193,17 @@ barplot_count(site_survey, train_sim_type, "Types of training simulation availab
   facet_wrap(~wb, ncol = 4)
 ```
 
-:::
-
-
-::: {.panel-tabset}
-
 ## Plot
 
 ```{r, fig.height = 5, fig.width=10}
-mytreemap(site_survey, wb, tain_chole) +
-  ggtitle("Structured programmes/coaching for cholecystectomy training")
+mytreemap(site_survey, wb, train_sim_type) +
+  ggtitle("Types of training simulation available")
 ```
+
+
+:::
+
+::: panel-tabset
 
 ## Counts
 
@@ -208,16 +212,16 @@ barplot_count(site_survey, tain_chole, "Structured programmes/coaching for chole
   facet_wrap(~wb, ncol = 4)
 ```
 
-:::
-
-::: {.panel-tabset}
-
 ## Plot
 
 ```{r, fig.height = 5, fig.width=10}
-mytreemap(site_survey, wb, train_bdi) +
-  ggtitle("Structured programmes/coaching for bile duct injury training")
+mytreemap(site_survey, wb, tain_chole) +
+  ggtitle("Structured programmes/coaching for cholecystectomy training")
 ```
+
+:::
+
+::: panel-tabset
 
 ## Counts
 
@@ -228,7 +232,12 @@ barplot_count(site_survey, train_bdi,
   scale_x_continuous(expand = expansion(mult = c(0, 0.33), add = c(0, 0)))
 ```
 
+## Plot
+
+```{r, fig.height = 5, fig.width=10}
+mytreemap(site_survey, wb, train_bdi) +
+  ggtitle("Structured programmes/coaching for bile duct injury training")
+```
+
 :::
-
-
 :::
