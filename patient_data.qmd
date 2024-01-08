@@ -97,7 +97,7 @@ bslib::value_box(
 )
 ```
 
-&nbsp;
+ 
 
 ```{r}
 bslib::value_box(
@@ -113,22 +113,18 @@ bslib::value_box(
 )
 ```
 
-
 ```{r}
 map_patients
 ```
 
-
 ```{r}
 map_registrations
 ```
-
-
 :::
 
 ::: {layout-ncol="2"}
 ```{r, fig.height=10}
-barplot_count(patient_data, period, "Data collection period", high_n = 400)
+barplot_count(patient_data, period, "Data collection period", high_n = 2000)
 ```
 
 ```{r}
@@ -150,7 +146,6 @@ barplot_count(patient_data, op_approach,
   facet_wrap(~wb, ncol = 1)
 ```
 
-
 ## Top 10 countries
 
 ```{r}
@@ -168,7 +163,6 @@ patient_data %>%
   slice(1:10) %>% 
   knitr::kable()
 ```
-
 
 ## NIHR Global Surgery Unit hub countries
 
@@ -193,7 +187,4 @@ registrations %>%
   knitr::kable()
 
 ```
-
-
 :::
-

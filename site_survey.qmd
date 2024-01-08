@@ -75,7 +75,6 @@ barplot_count(site_survey, hosp_hpb_path, "HPB: dedicated pathway for bile duct 
 
 ::: {layout-ncol="1"}
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.height=8, fig.width=10}
@@ -90,11 +89,9 @@ mytreemap(site_survey, wb, hosp_hpb_oncall) +
   ggtitle("On-call services from the HPB team")
 
 ```
-
 :::
 
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.width=12, fig.height = 5}
@@ -110,7 +107,6 @@ mytreemap(site_survey, wb, hosp_hpb_region) +
   ggtitle("On-call surgeons specialised in HPB")
 
 ```
-
 :::
 
 ```{r, fig.width=12, fig.height = 5}
@@ -146,7 +142,6 @@ histogram(site_survey, train_n, "Trainees who perform gallbladder surgery", "Num
 
 ::: {layout-ncol="1"}
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.width=13, fig.height = 15}
@@ -157,16 +152,13 @@ barplot_count(site_survey, train_grade, "Grade of trainees who perform gallbladd
 
 ## Plot
 
-
 ```{r, fig.height = 5, fig.width=10}
 mytreemap(site_survey, wb, train_grade) +
   ggtitle("Grade of trainees who perform gallbladder surgery")
 ```
-
 :::
 
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.height = 8, fig.width=10}
@@ -180,12 +172,9 @@ barplot_count(site_survey, train_sim_yn, "Facilities for simulations training fo
 mytreemap(site_survey, wb, train_sim_yn) +
   ggtitle("Facilities for simulations training for cholecystectomies?")
 ```
-
-
 :::
 
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.height = 8, fig.width=10}
@@ -199,12 +188,9 @@ barplot_count(site_survey, train_sim_type, "Types of training simulation availab
 mytreemap(site_survey, wb, train_sim_type) +
   ggtitle("Types of training simulation available")
 ```
-
-
 :::
 
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.height = 8, fig.width=10}
@@ -218,11 +204,9 @@ barplot_count(site_survey, tain_chole, "Structured programmes/coaching for chole
 mytreemap(site_survey, wb, tain_chole) +
   ggtitle("Structured programmes/coaching for cholecystectomy training")
 ```
-
 :::
 
 ::: panel-tabset
-
 ## Counts
 
 ```{r, fig.width = 12, fig.height = 10}
@@ -238,6 +222,5 @@ barplot_count(site_survey, train_bdi,
 mytreemap(site_survey, wb, train_bdi) +
   ggtitle("Structured programmes/coaching for bile duct injury training")
 ```
-
 :::
 :::
