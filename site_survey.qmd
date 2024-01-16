@@ -24,6 +24,9 @@ site_survey = site_survey_orig %>%
   mutate(hosp_itu_bed = parse_number(hosp_itu_bed),
          train_n = parse_number(train_n))
 
+board = pins::board_connect()
+board %>% pins::pin_write(site_survey, name  = "gecko_site_survey")
+
 xlab = "Number of hospitals"
 ```
 

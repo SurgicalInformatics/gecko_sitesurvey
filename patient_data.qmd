@@ -10,6 +10,7 @@ execute:
   warning: false
 editor_options: 
   chunk_output_type: console
+callout-appearance: simple
 ---
 
 ```{r}
@@ -27,7 +28,8 @@ source("patient_data_pull.R")
 #load("patient_data_orig.rda")
 
 source("registrations_pull.R")
-source("world_map.R")
+#save(registrations_orig, file = "registrations_data_orig.rda")
+
 
 #patient_data_orig$period %>% unique() %>% factor() %>% levels()
 
@@ -39,6 +41,9 @@ patient_data = patient_data_orig %>%
 
 
 registrations = registrations_orig
+
+source("world_map.R")
+
 
 ```
 
@@ -97,7 +102,7 @@ bslib::value_box(
 )
 ```
 
- 
+
 
 ```{r}
 bslib::value_box(
@@ -123,43 +128,14 @@ map_registrations
 :::
 
 ::: {layout-ncol="2"}
-```{r, fig.height=10}
-barplot_count(patient_data, period, "Data collection period", high_n = 2000)
-```
 
-```{r}
-barplot_count(patient_data, wb, "World bank income group", high_n = 2000)
-```
+::: {.callout-tip icon=false collapse=true}
 
-```{r}
-barplot_count(patient_data, op_performed, "Operation performed", high_n = 4000) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)))
-```
-:::
-
-::: {layout-ncol="1"}
-```{r, fig.width = 12, fig.height = 12}
-barplot_count(patient_data, op_approach,
-              "Operative approach by World Bank income group",
-              high_n = 1500) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)), labels = scales::label_comma()) +
-  facet_wrap(~wb, ncol = 1)
-```
-
-## Top 10 countries
+# Patient numbers Top 10
 
 ```{r}
 patient_data %>% 
   count(country, sort = TRUE, name = "n_patients") %>% 
-  slice(1:10) %>% 
-  knitr::kable()
-```
-
-## Top 10 hospitals
-
-```{r}
-patient_data %>% 
-  count(redcap_data_access_group, sort = TRUE, name = "n_patients") %>% 
   slice(1:10) %>% 
   knitr::kable()
 ```
@@ -176,6 +152,19 @@ patient_data %>%
 
 ```
 
+:::
+
+::: {.callout-warning icon=false collapse=true}
+
+# Registrations Top 10
+
+```{r}
+patient_data %>% 
+  count(redcap_data_access_group, sort = TRUE, name = "n_patients") %>% 
+  slice(1:10) %>% 
+  knitr::kable()
+```
+
 #### Registrations NIHR Global Surgery Unit hub countries
 
 ```{r}
@@ -187,4 +176,71 @@ registrations %>%
   knitr::kable()
 
 ```
+
+:::
+
+:::
+
+# Operative approach - Laparoscopic/Robotic vs Open
+::: panel-tabset
+
+## Map
+
+```{r}
+map_op_approach
+```
+
+## Plot
+
+Interactive dataset explorer: https://argoshare.is.ed.ac.uk/gecko_shinyviz/
+
+```{r, fig.width = 12, fig.height = 12}
+barplot_count(patient_data, op_approach,
+              "Operative approach by World Bank income group",
+              high_n = 1500) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)), labels = scales::label_comma()) +
+  facet_wrap(~wb, ncol = 1)
+```
+
+
+## Table
+
+```{r}
+op_approach %>%
+  gt::gt() %>% 
+  gt::opt_interactive(use_search = TRUE,
+                      use_pagination = FALSE)
+```
+
+
+
+## Histogram
+
+```{r}
+op_approach %>% 
+  ggplot(aes(prop_laprob)) +
+  geom_histogram() +
+  xlab("Proportion of Lap/Rob/Conv") +
+  ylab("n countries")
+```
+
+
+:::
+
+
+
+::: {layout-ncol="2"}
+```{r, fig.height=10}
+barplot_count(patient_data, period, "Data collection period", high_n = 2000)
+```
+
+```{r}
+barplot_count(patient_data, wb, "World bank income group", high_n = 2000)
+```
+
+```{r}
+barplot_count(patient_data, op_performed, "Operation performed", high_n = 4000) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)))
+```
+
 :::
