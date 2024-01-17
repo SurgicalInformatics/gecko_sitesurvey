@@ -181,7 +181,7 @@ registrations %>%
 
 :::
 
-# Operative approach - Laparoscopic/Robotic vs Open
+# Operative approach - Minimally invasive surgery (MIS) vs Open
 ::: panel-tabset
 
 ## Map

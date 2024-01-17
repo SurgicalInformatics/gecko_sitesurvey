@@ -120,7 +120,7 @@ map_op_approach = country_summary %>%
     download_map_data = TRUE,
     name = "",
     borderColor = "black", borderWidth = 0.1,
-    tooltip = list(pointFormat = "{point.name}: {point.n_laprob}/{point.n_op_approach} ({point.perc}) Lap+Rob/total")
+    tooltip = list(pointFormat = "{point.name}: {point.n_laprob}/{point.n_op_approach} ({point.perc}) MIS/total")
   ) %>%
   hc_mapView(projection = "EqualEarth") %>% 
   hc_mapNavigation(enabled = FALSE) %>%
