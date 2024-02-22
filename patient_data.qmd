@@ -19,6 +19,7 @@ library(scales)
 library(bslib)
 library(bsicons)
 library(shiny)
+library(consort)
 
 
 # GECKO green is #74a73e
@@ -34,11 +35,31 @@ source("registrations_pull.R")
 #patient_data_orig$period %>% unique() %>% factor() %>% levels()
 
 n_records = nrow(patient_data_orig)
+
+# patient_data_orig %>% 
+#   count(internal_check)
+
 patient_data = patient_data_orig %>% 
   # REDCap sends the data fields including sub-var names in {}, removing here:
   mutate(op_performed = str_extract(op_performed, "^.*(?=(\\{))")) %>% 
-  mutate(period = fct_explicit_na(period, "Missing"))
+  mutate(period = fct_explicit_na(period, "Missing")) %>% 
+  mutate(wb = fct_relevel(wb, "High income", "Upper middle income", "Lower middle income"))
 
+# patient_data %>% 
+#   count(inclusion_exclusion, internal_check)
+
+patient_data_cleaned = patient_data %>% 
+  filter(internal_check == "Pass - included in analysis")
+
+patient_data = patient_data %>% 
+  mutate(inclusion_exclusion = na_if(inclusion_exclusion, "Include - this is a valid record for a patient who fulfils inclusion criteria")) %>% 
+  mutate(internal_check = na_if(internal_check, "Pass - included in analysis"))
+
+# patient_data %>% 
+#   count(inclusion_exclusion, internal_check)
+
+
+n_records_cleaned = nrow(patient_data_cleaned)
 
 registrations = registrations_orig
 
@@ -56,10 +77,17 @@ theme_update(axis.text  = element_text(size = 16, colour = "black"),
              plot.title = element_text(size = 20, colour = "black"),
              strip.text = element_text(size = 16, colour = "black"))
 
-barplot_count = function(df, var, title = NA, high_n = 50){
+barplot_count = function(df, var, title = NA, high_n = 50, infreq = TRUE){
+  if (infreq){
+    df = df %>% 
+      mutate(plotvar = fct_infreq({{var}}))
+  } else{
+    df = df %>% 
+      mutate(plotvar = {{var}})
+  }
   df %>% 
     drop_na({{var}}) %>% 
-    ggplot(aes(y = fct_rev(fct_infreq({{var}})) %>% fct_relevel("Missing"))) +
+    ggplot(aes(y = fct_rev(plotvar) %>% fct_relevel("Missing"))) +
     geom_bar(colour = "#2166ac", fill = "#d1e5f0") +
     geom_text(stat='count', aes(label=comma(after_stat(count)),
                                 hjust = if_else(after_stat(count) > high_n, 1, 0)),
@@ -87,6 +115,44 @@ histogram = function(df, var, title = NA, xlab = NA, ylab = NA){
 ```
 
 ::: {layout-ncol="1"}
+
+Records that pass internal quality check:
+
+```{r}
+bslib::value_box(
+  title = "GECKO patient data:",
+  value = paste(prettyNum(n_records_cleaned, big.mark = ","), "records from"),
+  showcase = bs_icon("clipboard2-pulse-fill"),
+  h3(paste(n_distinct(patient_data_cleaned$redcap_data_access_group) %>% 
+             prettyNum(big.mark = ","), "hospitals in")),
+  h3(paste(n_distinct(patient_data_cleaned$country), "countries")),
+  br(),
+  p("Updated:"),
+  p(format(Sys.time(), "%d-%b %Y")),
+  theme_color = "success"
+)
+```
+
+```{r}
+#| include: false
+consort_plot(patient_data,
+             order = list(record_id    = "Records started on REDCap",
+                          inclusion_exclusion   = "Excluded with reasons:",
+                          record_id = "Records considered",
+                          internal_check  = "Internal DQ check",
+                          #record_id    = "Included in analysis",
+                          wb      = "Included in analysis",
+                          record_id    = " "),
+             side_box = c("inclusion_exclusion", "internal_check"),
+             allocation = "wb",
+             cex = 0.8,
+             text_width = 30)
+
+```
+
+
+Records started on REDCap:
+
 ```{r}
 bslib::value_box(
   title = "GECKO patient data:",
@@ -195,7 +261,7 @@ map_op_approach
 Interactive dataset explorer: https://argoshare.is.ed.ac.uk/gecko_shinyviz/
 
 ```{r, fig.width = 12, fig.height = 12}
-barplot_count(patient_data, op_approach,
+barplot_count(patient_data_cleaned, op_approach,
               "Operative approach by World Bank income group",
               high_n = 1500) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)), labels = scales::label_comma()) +
@@ -231,15 +297,15 @@ op_approach %>%
 
 ::: {layout-ncol="2"}
 ```{r, fig.height=10}
-barplot_count(patient_data, period, "Data collection period", high_n = 2000)
+barplot_count(patient_data_cleaned, period, "Data collection period", high_n = 2000, infreq = FALSE)
 ```
 
 ```{r}
-barplot_count(patient_data, wb, "World bank income group", high_n = 2000)
+barplot_count(patient_data_cleaned, wb, "World bank income group", high_n = 2000, infreq = FALSE)
 ```
 
 ```{r}
-barplot_count(patient_data, op_performed, "Operation performed", high_n = 4000) +
+barplot_count(patient_data_cleaned, op_performed, "Operation performed", high_n = 4000) +
   scale_x_continuous(expand = expansion(mult = c(0, 0.01), add = c(0, 0)))
 ```
 
